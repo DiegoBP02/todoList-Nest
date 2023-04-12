@@ -1,5 +1,5 @@
 import { IsString, MaxLength, IsNotEmpty, IsDateString } from 'class-validator';
-import { TaskPriority, TaskStatus } from 'src/schema/task.schema';
+import { TaskPriority, TaskStatus } from '../schema/task.schema';
 
 export class CreateTaskDto {
   @IsString()

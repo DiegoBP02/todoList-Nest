@@ -24,7 +24,7 @@ export class Task {
   status: string;
 
   @Prop()
-  deadline: Date;
+  deadline: string;
 }
 
 export const TaskSchema = SchemaFactory.createForClass(Task);

@@ -1,23 +1,23 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ITask } from 'src/interface/task.interface';
-import { CreateTaskDto } from 'src/dto/create-task.dto';
-import { UpdateTaskDto } from 'src/dto/update-task.dto';
+import { CreateTaskDto } from '../dto/create-task.dto';
+import { UpdateTaskDto } from '../dto/update-task.dto';
+import { Task } from '../schema/task.schema';
+import { TaskNotFound } from '../exceptions/task-not-found.exception';
 
 @Injectable()
 export class TaskService {
-  constructor(@InjectModel('Task') private taskModel: Model<ITask>) {}
+  constructor(@InjectModel('Task') private taskModel: Model<Task>) {}
 
-  async createTask(createTaskDto: CreateTaskDto): Promise<ITask> {
-    const task = await this.taskModel.create(createTaskDto);
-    return task;
+  async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
+    return await this.taskModel.create(createTaskDto);
   }
 
   async updateTask(
     taskId: string,
     updateTaskDto: UpdateTaskDto,
-  ): Promise<ITask> {
+  ): Promise<Task> {
     const task = await this.taskModel.findByIdAndUpdate(taskId, updateTaskDto, {
       new: true,
       runValidators: true,
@@ -30,7 +30,7 @@ export class TaskService {
     return task;
   }
 
-  async getAllTasks(): Promise<ITask[]> {
+  async getAllTasks(): Promise<Task[]> {
     const tasks = await this.taskModel.find();
 
     if (!tasks || tasks.length === 0) {
@@ -40,17 +40,15 @@ export class TaskService {
     return tasks;
   }
 
-  async getTask(taskId: string): Promise<ITask> {
+  async getTask(taskId: string): Promise<Task> {
     const task = await this.taskModel.findById(taskId).exec();
 
-    if (!task) {
-      throw new NotFoundException(`Task with ${taskId} id not found!`);
-    }
+    if (!task) throw new TaskNotFound();
 
     return task;
   }
 
-  async deleteTask(taskId: string): Promise<ITask> {
+  async deleteTask(taskId: string): Promise<Task> {
     const task = await this.taskModel.findByIdAndDelete(taskId);
 
     if (!task) {

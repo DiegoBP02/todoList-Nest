@@ -9,24 +9,18 @@ import {
   Delete,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
-import { CreateTaskDto } from 'src/dto/create-task.dto';
 import { Response } from 'express';
-import { UpdateTaskDto } from 'src/dto/update-task.dto';
+import { UpdateTaskDto } from '../dto/update-task.dto';
+import { Task } from '../schema/task.schema';
+import { CreateTaskDto } from '../dto/create-task.dto';
 
 @Controller('task')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
   @Post()
-  async createTask(@Res() res: Response, @Body() createTaskDto: CreateTaskDto) {
-    try {
-      const task = await this.taskService.createTask(createTaskDto);
-      return res.status(201).json(task);
-    } catch (error) {
-      return res
-        .status(400)
-        .json({ msg: 'Something went wrong!', error: error.message });
-    }
+  async createTask(@Body() createTaskDto: CreateTaskDto): Promise<Task> {
+    return await this.taskService.createTask(createTaskDto);
   }
 
   @Put('/:id')
@@ -58,15 +52,9 @@ export class TaskController {
   }
 
   @Get('/:id')
-  async getTask(@Res() res: Response, @Param('id') taskId: string) {
-    try {
-      const task = await this.taskService.getTask(taskId);
-      return res.status(200).json(task);
-    } catch (error) {
-      return res
-        .status(400)
-        .json({ msg: 'Something went wrong!', error: error.message });
-    }
+  async getTask(@Param('id') taskId: string): Promise<Task> {
+    const task = await this.taskService.getTask(taskId);
+    return task;
   }
 
   @Delete('/:id')
