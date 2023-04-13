@@ -7,6 +7,8 @@ import mongoose, { Connection, Model, connect } from 'mongoose';
 import { getModelToken } from '@nestjs/mongoose';
 import { CreateTaskDtoStub } from '../test/stubs/create-task.dto.stub';
 import { TaskDtoStub, TaskStub } from '../test/stubs/task.dto.stub';
+import { TaskNotFound } from '../exceptions/task-not-found.exception';
+import { NotFoundException } from '@nestjs/common';
 describe('TaskController', () => {
   let taskController: TaskController;
   let taskService: TaskService;
@@ -52,7 +54,6 @@ describe('TaskController', () => {
   describe('Create task', () => {
     it('should return the saved object', async () => {
       const task = await taskController.createTask(CreateTaskDtoStub());
-
       expect(task).toBeDefined();
       expect(task.name).toEqual(CreateTaskDtoStub().name);
     });
@@ -65,6 +66,63 @@ describe('TaskController', () => {
       )) as TaskStub;
       const task = (await taskController.getTask(taskId)) as TaskStub;
       expect(task._id).toEqual(taskId);
+    });
+    it('should return 404 - TaskNotFound', async () => {
+      const randomId = new mongoose.Types.ObjectId().toString();
+      const task = taskController.getTask(randomId);
+      await expect(task).rejects.toThrow(TaskNotFound);
+    });
+  });
+  describe('Get tasks', () => {
+    it('should return an array with one object', async () => {
+      await taskController.createTask(CreateTaskDtoStub());
+      const tasks = await taskController.getTasks();
+      expect(tasks.length === 1 && Array.isArray(tasks)).toBeTruthy();
+    });
+    it('should return the saved object', async () => {
+      const { _id: taskId } = (await taskController.createTask(
+        CreateTaskDtoStub(),
+      )) as TaskStub;
+      const tasks = (await taskController.getTasks()) as TaskStub[];
+      const task = tasks[0];
+      expect(task._id).toEqual(taskId);
+    });
+    it('should return 404 - NotFoundException', async () => {
+      const tasks = taskController.getTasks();
+      await expect(tasks).rejects.toThrow(NotFoundException);
+    });
+  });
+  describe('Update task', () => {
+    it('should an object with the updated name', async () => {
+      const newName = { name: 'randomName' };
+      const { _id: taskId } = (await taskController.createTask(
+        CreateTaskDtoStub(),
+      )) as TaskStub;
+      const task = (await taskController.updateTask(
+        taskId,
+        newName,
+      )) as TaskStub;
+      expect(task._id).toEqual(taskId);
+      expect(task.name).toEqual(newName.name);
+    });
+    it('should return 404 - TaskNotFound', async () => {
+      const randomId = new mongoose.Types.ObjectId().toString();
+      const task = taskController.getTask(randomId);
+      await expect(task).rejects.toThrow(TaskNotFound);
+    });
+  });
+  describe('Delete task', () => {
+    it('should return the deleted task', async () => {
+      const { _id: taskId } = (await taskController.createTask(
+        CreateTaskDtoStub(),
+      )) as TaskStub;
+      const task = (await taskController.deleteTask(taskId)) as TaskStub;
+      expect(task._id).toEqual(taskId);
+    });
+    it('should return 404 - TaskNotFound', async () => {
+      const randomId = new mongoose.Types.ObjectId().toString();
+      const task = taskController.deleteTask(randomId);
+      await expect(task).rejects.toThrow(TaskNotFound);
     });
   });
 });

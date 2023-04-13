@@ -5,6 +5,7 @@ import { CreateTaskDto } from '../dto/create-task.dto';
 import { UpdateTaskDto } from '../dto/update-task.dto';
 import { Task } from '../schema/task.schema';
 import { TaskNotFound } from '../exceptions/task-not-found.exception';
+import { DeleteResultDTO } from 'src/dto/delete-result.dto';
 
 @Injectable()
 export class TaskService {
@@ -23,9 +24,7 @@ export class TaskService {
       runValidators: true,
     });
 
-    if (!task) {
-      throw new NotFoundException(`Task with ${taskId} id not found!`);
-    }
+    if (!task) throw new TaskNotFound();
 
     return task;
   }
@@ -51,9 +50,7 @@ export class TaskService {
   async deleteTask(taskId: string): Promise<Task> {
     const task = await this.taskModel.findByIdAndDelete(taskId);
 
-    if (!task) {
-      throw new NotFoundException(`Task with ${taskId} id not found!`);
-    }
+    if (!task) throw new TaskNotFound();
 
     return task;
   }
