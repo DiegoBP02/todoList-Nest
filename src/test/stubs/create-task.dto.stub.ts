@@ -1,5 +1,5 @@
-import { CreateTaskDto } from '../../dto/create-task.dto';
-import { TaskPriority, TaskStatus } from '../../schema/task.schema';
+import { CreateTaskDto } from '../../tasks/dto/create-task.dto';
+import { TaskPriority, TaskStatus } from '../../tasks/schema/task.schema';
 
 export const CreateTaskDtoStub = (): CreateTaskDto => {
   const today = new Date();

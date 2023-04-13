@@ -2,16 +2,15 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TaskController } from './task.controller';
 import { TaskService } from './task.service';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { Task, TaskSchema } from '../schema/task.schema';
+import { Task, TaskSchema } from './schema/task.schema';
 import mongoose, { Connection, Model, connect } from 'mongoose';
 import { getModelToken } from '@nestjs/mongoose';
 import { CreateTaskDtoStub } from '../test/stubs/create-task.dto.stub';
-import { TaskDtoStub, TaskStub } from '../test/stubs/task.dto.stub';
-import { TaskNotFound } from '../exceptions/task-not-found.exception';
+import { TaskStub } from '../test/stubs/task.dto.stub';
+import { TaskNotFound } from './exceptions/task-not-found.exception';
 import { NotFoundException } from '@nestjs/common';
 describe('TaskController', () => {
   let taskController: TaskController;
-  let taskService: TaskService;
   let mongod: MongoMemoryServer;
   let mongoConnection: Connection;
   let taskModel: Model<Task>;
@@ -30,7 +29,6 @@ describe('TaskController', () => {
     }).compile();
 
     taskController = module.get<TaskController>(TaskController);
-    taskService = module.get<TaskService>(TaskService);
   });
 
   afterAll(async () => {
