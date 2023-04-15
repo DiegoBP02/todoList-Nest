@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -8,6 +8,7 @@ import { TaskController } from './tasks/task.controller';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { UsersSchema } from './users/schema/user.schema';
+import { APP_PIPE } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -19,6 +20,15 @@ import { UsersSchema } from './users/schema/user.schema';
     UsersModule,
   ],
   controllers: [AppController, TaskController],
-  providers: [AppService, TaskService],
+  providers: [
+    AppService,
+    TaskService,
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        whitelist: true,
+      }),
+    },
+  ],
 })
 export class AppModule {}

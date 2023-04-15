@@ -1,4 +1,4 @@
-import { Task } from 'src/tasks/schema/task.schema';
+import { Task } from '../../tasks/schema/task.schema';
 import { CreateTaskDtoStub } from './create-task.dto.stub';
 
 export interface TaskStub extends Task {
