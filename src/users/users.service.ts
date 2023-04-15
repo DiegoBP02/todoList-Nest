@@ -53,4 +53,14 @@ export class UsersService {
 
     return user;
   }
+
+  async findOne(email: string) {
+    const user = await this.userModel.findOne({ email });
+
+    if (!user) {
+      throw new UserNotFound();
+    }
+    const tokenUser = { name: user.name, email: user.email, role: user.role };
+    return tokenUser;
+  }
 }
